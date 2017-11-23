@@ -89,7 +89,9 @@
         items: [
           { icon: 'apps', title: 'Welcome', to: '/' },
           { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
-          { icon: 'backup', title: 'Uploads', to: '/uploads' }
+          { icon: 'backup', title: 'Uploads', to: '/uploads' },
+          { icon: 'list', title: 'QuickList', to: '/quicklist' },
+          { icon: 'list', title: 'Test', to: '/testgrid' }
         ],
         miniVariant: false,
         right: true,

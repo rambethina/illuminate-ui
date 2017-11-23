@@ -1,43 +1,109 @@
 <template>
-  <v-form v-model="valid">
-    <input
-    type="file" @change="onFileChange"
-    >
-    <v-text-field
-      label="Name"
-      v-model="name"
-      :rules="nameRules"
-      :counter="10"
-      required
-    ></v-text-field>
-    <v-text-field
-      label="E-mail"
-      v-model="email"
-      :rules="emailRules"
-      required
-    ></v-text-field>
-  </v-form>
+  <v-card color="secorndary flat">
+    <v-card-text>
+      <v-container fluid>
+        <v-layout row>
+          <v-flex xs4>
+            <v-subheader class="grey--text text--lighten-1">Upload your screencast</v-subheader>
+          </v-flex>
+          <v-flex xs8>
+            <input type="file" @change="onFileChange">
+          </v-flex>
+        </v-layout>
+      </v-container>
+      <v-form @submit.prevent="add({title, filepath, tags, description})">
+      <input type="hidden" id="screencast-url" v-model="filepath">
+      <v-container fluid>
+        <v-layout row>
+          <v-flex xs4>
+            <v-subheader class="grey--text text--lighten-1">Title</v-subheader>
+          </v-flex>
+          <v-flex xs8>
+            <v-text-field
+              name="title"
+              class="input-group--focused"
+              dark
+              v-model="title"
+            ></v-text-field>
+          </v-flex>
+        </v-layout>
+      </v-container>
+
+      <v-container fluid>
+        <v-layout row>
+          <v-flex xs4>
+            <v-subheader class="grey--text text--lighten-1">Tags</v-subheader>
+          </v-flex>
+          <v-flex xs8>
+            <v-text-field
+              name="tags"
+              class="input-group--focused"
+              dark
+              v-model="tags"
+            ></v-text-field>
+          </v-flex>
+        </v-layout>
+      </v-container>
+
+      <v-container fluid>
+        <v-layout row>
+          <v-flex xs4>
+            <v-subheader class="grey--text text--lighten-1">Description</v-subheader>
+          </v-flex>
+          <v-flex xs8>
+            <v-text-field
+              name="description"
+              class="input-group--focused"
+              dark
+              v-model="description"
+            ></v-text-field>
+          </v-flex>
+        </v-layout>
+      </v-container>
+
+      <v-container fluid>
+        <v-layout row>
+          <v-btn color="primary" type="submit" value="Add">Submit</v-btn>
+        </v-layout>
+      </v-container>
+      </v-form>
+      <ul>
+        <li v-for="cast in screenCastMetaList" v-bind:key="cast.title">
+          {{cast.title}}
+        </li>
+        <li v-for="cast in screenCastMetaList" v-bind:key="cast.tags">
+          {{cast.tags}}
+        </li>
+        <li v-for="cast in screenCastMetaList" v-bind:key="cast.description">
+          {{cast.description}}
+        </li>
+      </ul>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
   import axios from 'axios'
+  import { mapActions, mapState } from 'vuex'
 
   export default {
     data () {
       return {
-        valid: false,
-        name: '',
-        nameRules: [
-          (v) => !!v || 'Name is required',
-          (v) => v.length <= 10 || 'Name must be less than 10 characters'
-        ],
-        email: '',
-        emailRules: [
-          (v) => !!v || 'E-mail is required'
-        ]
+        title: 'test text',
+        tags: '',
+        description: ''
       }
     },
+    computed: {
+      ...mapState({
+        screenCastMetaList: state => state.screenCastMetaList,
+        filepath: state => state.filepath
+      })
+    },
     methods: {
+      // async onSubmit (e) {
+
+      // },
       async onFileChange (e) {
         const file = e.target.files[0]
         if (file == null) {
@@ -66,14 +132,18 @@
           if (xhr.readyState === 4) {
             if (xhr.status === 200) {
               // document.getElementById('preview').src = url
-              // document.getElementById('avatar-url').value = url
+              document.getElementById('screencast-url').value = res.data.url
+              this.$store.dispatch('addFilePath', res.data.url)
             } else {
-              alert(`Error uploading file ${JSON.stringify(xhr.responseText)}`)
+              console.log(`Error uploading file ${JSON.stringify(xhr.responseText)}`)
             }
           }
         }
         xhr.send(file)
-      }
+      },
+      ...mapActions([
+        'add'
+      ])
     }
   }
 </script>
